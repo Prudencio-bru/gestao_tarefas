@@ -81,4 +81,12 @@ public class TaskImplements implements TaskService {
                 task.getUpdatedAt()
         );
     }
+
+    @Override
+    public void delete(Long id_task) {
+        if(!taskRepository.existsById(id_task)){
+            throw new RuntimeException("Task not found");
+        }
+        taskRepository.deleteById(id_task);
+    }
 }

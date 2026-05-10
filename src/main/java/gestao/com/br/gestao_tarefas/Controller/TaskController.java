@@ -114,7 +114,7 @@ public class TaskController {
         ApiResponse<String> response = ApiResponse.ok(
                 "Task successfully registered!",
                 request.getRequestURI(),
-                HttpStatus.OK.value()
+                HttpStatus.CREATED.value()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -143,15 +143,40 @@ public class TaskController {
             HttpServletRequest request
     ) {
         List<ListTaskDto> list = taskService.findAll();
-        ApiResponse r = ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
-        return ResponseEntity.status(HttpStatus.OK).body(r);
+        ApiResponse<List<ListTaskDto>> response =
+                ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
+
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "List task by id")
     @GetMapping("/listById/{id_task}")
-    public ResponseEntity<ApiResponse<ListTaskDto>> findById( Long id_task, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<ListTaskDto>> findById(
+            @PathVariable("id_task") Long id_task,
+            HttpServletRequest request)
+    {
         ListTaskDto task = taskService.findById(id_task);
-        ApiResponse r = ApiResponse.ok(task, request.getRequestURI(), HttpStatus.OK.value());
-        return ResponseEntity.status(HttpStatus.OK).body(r);
+        ApiResponse<ListTaskDto> response =
+                ApiResponse.ok(task, request.getRequestURI(), HttpStatus.OK.value());
+
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Delete task by id")
+    @DeleteMapping("/delete/{id_task}")
+    public ResponseEntity<ApiResponse<String>> deleteTask(
+            @PathVariable("id_task") Long idTask,
+            HttpServletRequest request
+    ) {
+        taskService.delete(idTask);
+
+        ApiResponse<String> response = ApiResponse.ok(
+                "Task successfully deleted!",
+                request.getRequestURI(),
+                HttpStatus.NO_CONTENT.value()
+        );
+
+        return ResponseEntity.ok(response);
+
     }
 }
