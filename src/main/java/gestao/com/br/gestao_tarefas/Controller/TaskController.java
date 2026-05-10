@@ -3,6 +3,7 @@ package gestao.com.br.gestao_tarefas.Controller;
 
 import gestao.com.br.gestao_tarefas.Api.ApiResponse;
 import gestao.com.br.gestao_tarefas.Dto.Task.CreateTaskDto;
+import gestao.com.br.gestao_tarefas.Dto.Task.UpdateTaskDto;
 import gestao.com.br.gestao_tarefas.Service.Task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -99,7 +100,7 @@ public class TaskController {
                     content = @Content
             )
     })
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<ApiResponse<String>> createTask(
             @Valid @RequestBody CreateTaskDto dto,
             HttpServletRequest request
@@ -114,5 +115,22 @@ public class TaskController {
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Update task")
+    @PutMapping("/update")
+    public  ResponseEntity<ApiResponse<String>> updateTask(
+            @Valid @RequestBody UpdateTaskDto dto,
+            HttpServletRequest request
+    ) {
+        taskService.updateTask(dto);
+
+        ApiResponse<String> response = ApiResponse.ok(
+                "Task successfully update!",
+                request.getRequestURI(),
+                HttpStatus.OK.value()
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
