@@ -3,6 +3,7 @@ package gestao.com.br.gestao_tarefas.Controller;
 
 import gestao.com.br.gestao_tarefas.Api.ApiResponse;
 import gestao.com.br.gestao_tarefas.Dto.Task.CreateTaskDto;
+import gestao.com.br.gestao_tarefas.Dto.Task.ListTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.UpdateTaskDto;
 import gestao.com.br.gestao_tarefas.Service.Task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +17,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/tasks")
@@ -132,5 +135,23 @@ public class TaskController {
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(summary = "List task")
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> listTask(
+            HttpServletRequest request
+    ) {
+        List<ListTaskDto> list = taskService.findAll();
+        ApiResponse r = ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
+        return ResponseEntity.status(HttpStatus.OK).body(r);
+    }
+
+    @Operation(summary = "List task by id")
+    @GetMapping("/listById/{id_task}")
+    public ResponseEntity<ApiResponse<ListTaskDto>> findById( Long id_task, HttpServletRequest request) {
+        ListTaskDto task = taskService.findById(id_task);
+        ApiResponse r = ApiResponse.ok(task, request.getRequestURI(), HttpStatus.OK.value());
+        return ResponseEntity.status(HttpStatus.OK).body(r);
     }
 }
