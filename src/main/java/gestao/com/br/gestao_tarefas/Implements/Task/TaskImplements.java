@@ -2,6 +2,7 @@ package gestao.com.br.gestao_tarefas.Implements.Task;
 
 import gestao.com.br.gestao_tarefas.Dto.Task.CreateTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.ListTaskDto;
+import gestao.com.br.gestao_tarefas.Dto.Task.UpdateStatusTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.UpdateTaskDto;
 import gestao.com.br.gestao_tarefas.Entity.Task.TaskEntity;
 import gestao.com.br.gestao_tarefas.Enum.Task.PriorityTaskEnum;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,8 +41,12 @@ public class TaskImplements implements TaskService {
             throw new BusinessException("Expiration date information is required.");
         }
 
-        if (dto.getTitle().isBlank() || dto.getTitle().isEmpty()) {
-            throw new BusinessException("Title information is required.");
+        if (dto.getTitle().isBlank() || dto.getTitle().isEmpty() || dto.getTitle().trim().length() < 3) {
+            throw new BusinessException("Title must have at least 3 characters");
+        }
+
+        if (dto.getDue_date() != null && dto.getDue_date().isBefore(LocalDate.now())) {
+            throw new BusinessException("Due date cannot be earlier than today");
         }
 
         TaskEntity taskEntity = new TaskEntity();
@@ -59,6 +65,13 @@ public class TaskImplements implements TaskService {
 
         Optional.ofNullable(dto.getId_task()).orElseThrow(() -> new BusinessException("Please provide the ID of the task you wish to modify."));
 
+        if (dto.getTitle().isBlank() || dto.getTitle().isEmpty() || dto.getTitle().trim().length() < 3) {
+            throw new BusinessException("Title must have at least 3 characters");
+        }
+
+        if (dto.getDue_date() != null && dto.getDue_date().isBefore(LocalDate.now())) {
+            throw new BusinessException("Due date cannot be earlier than today");
+        }
 
         TaskEntity taskEntity = taskRepository.findById(dto.getId_task()).orElseThrow(() -> new TaskNotFoundException(dto.getId_task()));
         taskEntity.setTitle(dto.getTitle());
@@ -106,8 +119,10 @@ public class TaskImplements implements TaskService {
 
     @Override
     public void delete(Long id_task) {
-        if(!taskRepository.existsById(id_task)){
-            throw new TaskNotFoundException(id_task);
+        TaskEntity task = taskRepository.findById(id_task)
+                .orElseThrow(() -> new TaskNotFoundException(id_task));
+        if (task.getStatus() == StatusTaskEnum.done) {
+            throw new BusinessException("Completed tasks cannot be deleted");
         }
         taskRepository.deleteById(id_task);
     }
@@ -239,5 +254,22 @@ public class TaskImplements implements TaskService {
                         task.getUpdatedAt()
                 ))
                 .toList();
+    }
+
+    //Update Status Task
+    @Override
+    public void updateStatus(UpdateStatusTaskDto dto) {
+
+        TaskEntity task = taskRepository.findById(dto.id_task())
+                .orElseThrow(() -> new TaskNotFoundException(dto.id_task()));
+
+        if (task.getStatus() == StatusTaskEnum.done) {
+            throw new BusinessException("Task already finished and cannot change status");
+        }
+
+        task.setStatus(dto.status());
+        task.setUpdatedAt(LocalDateTime.now());
+
+        taskRepository.save(task);
     }
 }

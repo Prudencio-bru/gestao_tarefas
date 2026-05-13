@@ -2,16 +2,32 @@ package gestao.com.br.gestao_tarefas.Dto.Task;
 
 import gestao.com.br.gestao_tarefas.Enum.Task.PriorityTaskEnum;
 import gestao.com.br.gestao_tarefas.Enum.Task.StatusTaskEnum;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
 public class CreateTaskDto {
+
+    @NotBlank(message = "Title must not be blank")
+    @Size(min = 3, message = "Title must have at least 3 characters")
     private String title;
+
     private String description;
+
+    @NotNull(message = "Status is required")
     private StatusTaskEnum status;
+
+    @NotNull(message = "Priority is required")
     private PriorityTaskEnum priority;
+
+    @NotNull(message = "Due date is required")
+    @FutureOrPresent(message = "Due date must be today or in the future")
     private LocalDate due_date;
 
+    // getters e setters
     public String getTitle() {
         return title;
     }

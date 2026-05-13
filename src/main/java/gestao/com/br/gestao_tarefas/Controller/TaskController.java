@@ -4,9 +4,11 @@ package gestao.com.br.gestao_tarefas.Controller;
 import gestao.com.br.gestao_tarefas.Api.ApiResponse;
 import gestao.com.br.gestao_tarefas.Dto.Task.CreateTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.ListTaskDto;
+import gestao.com.br.gestao_tarefas.Dto.Task.UpdateStatusTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.UpdateTaskDto;
 import gestao.com.br.gestao_tarefas.Enum.Task.PriorityTaskEnum;
 import gestao.com.br.gestao_tarefas.Enum.Task.StatusTaskEnum;
+import gestao.com.br.gestao_tarefas.Repository.TaskRepository;
 import gestao.com.br.gestao_tarefas.Service.Task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,11 +16,13 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -177,11 +181,10 @@ public class TaskController {
         ApiResponse<String> response = ApiResponse.ok(
                 "Task successfully deleted!",
                 request.getRequestURI(),
-                HttpStatus.NO_CONTENT.value()
+                HttpStatus.OK.value()
         );
 
-        return ResponseEntity.ok(response);
-
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     //Filtro de busca por status das tarefas
@@ -270,6 +273,23 @@ public class TaskController {
                         HttpStatus.OK.value()
                 )
         );
+    }
+
+    @Operation(summary = "Update task status")
+    @PatchMapping("/update-status")
+    public ResponseEntity<ApiResponse<String>> updateTaskStatus(
+            @Valid @RequestBody UpdateStatusTaskDto dto,
+            HttpServletRequest request
+    ) {
+        taskService.updateStatus(dto);
+
+        ApiResponse<String> response = ApiResponse.ok(
+                "Task status updated successfully!",
+                request.getRequestURI(),
+                HttpStatus.OK.value()
+        );
+
+        return ResponseEntity.ok(response);
     }
 }
 
