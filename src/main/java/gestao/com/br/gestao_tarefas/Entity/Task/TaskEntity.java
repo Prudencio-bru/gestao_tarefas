@@ -31,7 +31,7 @@ public class TaskEntity {
     private PriorityTaskEnum priority;
 
     @Column(name = "due_date")
-    private LocalDate due_date;
+    private LocalDate dueDate;
 
     @Column(name = "createdAt")
     private LocalDateTime createdAt;
@@ -79,12 +79,12 @@ public class TaskEntity {
         this.priority = priority;
     }
 
-    public LocalDate getDue_date() {
-        return due_date;
+    public LocalDate getDueDate() {
+        return dueDate;
     }
 
-    public void setDue_date(LocalDate due_date) {
-        this.due_date = due_date;
+    public void setDueDate(LocalDate dueDate) {
+        this.dueDate = dueDate;
     }
 
     public LocalDateTime getCreatedAt() {

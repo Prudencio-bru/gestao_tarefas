@@ -5,6 +5,8 @@ import gestao.com.br.gestao_tarefas.Api.ApiResponse;
 import gestao.com.br.gestao_tarefas.Dto.Task.CreateTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.ListTaskDto;
 import gestao.com.br.gestao_tarefas.Dto.Task.UpdateTaskDto;
+import gestao.com.br.gestao_tarefas.Enum.Task.PriorityTaskEnum;
+import gestao.com.br.gestao_tarefas.Enum.Task.StatusTaskEnum;
 import gestao.com.br.gestao_tarefas.Service.Task.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,10 +16,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -55,7 +59,7 @@ public class TaskController {
                         "description": "Criar API REST com JPA",
                         "status": "PENDING",
                         "priority": "HIGH",
-                        "dueDate": "2026-05-10"
+                        "due_date": "2026-05-10"
                       }
                     }
                     """
@@ -179,4 +183,93 @@ public class TaskController {
         return ResponseEntity.ok(response);
 
     }
+
+    //Filtro de busca por status das tarefas
+    @Operation(summary = "List tasks by status")
+    @GetMapping("/listByStatus")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> listByStatus(
+            @RequestParam StatusTaskEnum status,
+            HttpServletRequest request
+    ) {
+        List<ListTaskDto> list = taskService.findByStatus(status);
+
+        ApiResponse<List<ListTaskDto>> response =
+                ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
+
+        return ResponseEntity.ok(response);
+    }
+
+    //Filtro de busca por prioridade
+    @Operation(summary = "List tasks by priority")
+    @GetMapping("/listByPriority")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> listByPriority(
+            @RequestParam PriorityTaskEnum priority,
+            HttpServletRequest request
+    ) {
+        List<ListTaskDto> list = taskService.findByPriority(priority);
+
+        ApiResponse<List<ListTaskDto>> response =
+                ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
+
+        return ResponseEntity.ok(response);
+    }
+
+    //Filtro de busca por prazo final da tarefa
+    @Operation(summary = "List tasks by Due Date")
+    @GetMapping("listByDueDate")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> listByDueDate(
+            @RequestParam("due_date")
+            LocalDate due_date,
+            HttpServletRequest request
+    ) {
+        List<ListTaskDto> list = taskService.findByDueDate(due_date);
+
+        ApiResponse<List<ListTaskDto>> response =
+                ApiResponse.ok(list, request.getRequestURI(), HttpStatus.OK.value());
+
+        return ResponseEntity.ok(response);
+    }
+
+    //Ordenação Crescente
+    @GetMapping("/order/createdAt/asc")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> orderByCreatedAtAsc(
+            HttpServletRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.listOrderByCreatedAtAsc(),
+                        request.getRequestURI(),
+                        HttpStatus.OK.value()
+                )
+        );
+    }
+
+    //Ordenação Decrescente
+    @GetMapping("/order/createdAt/desc")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> orderByCreatedAtDesc(
+            HttpServletRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.listOrderByCreatedAtDesc(),
+                        request.getRequestURI(),
+                        HttpStatus.OK.value()
+                )
+        );
+    }
+
+    //Ordenação por Prioridade
+    @GetMapping("/order/priority")
+    public ResponseEntity<ApiResponse<List<ListTaskDto>>> orderByPriority(
+            HttpServletRequest request) {
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(
+                        taskService.listOrderByPriority(),
+                        request.getRequestURI(),
+                        HttpStatus.OK.value()
+                )
+        );
+    }
 }
+

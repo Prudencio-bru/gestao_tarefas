@@ -19,6 +19,10 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException ex,
             HttpServletRequest req) {
 
+        GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
+
+        globalExceptionHandler.handleInvalidFormat(ex, req);
+
         ApiError err = new ApiError(
                 "FORMATO_INVALIDO",
                 "O formato de um ou mais campos no JSON está incorreto.",
@@ -119,6 +123,34 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(
+            IllegalArgumentException ex,
+            HttpServletRequest req) {
+
+        ApiError err = new ApiError(
+                "ARGUMENTO_INVALIDO",
+                ex.getMessage(),
+                null
+        );
+
+        ApiResponse<Void> body = ApiResponse.error(
+                err,
+                req.getRequestURI(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+
+    @ExceptionHandler(TaskNotFoundException.class)
+        public ResponseEntity<ApiError> handleTaskNotFound(TaskNotFoundException ex) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new ApiError("TASK_NOT_FOUND", ex.getMessage(), null));
     }
 }
 
