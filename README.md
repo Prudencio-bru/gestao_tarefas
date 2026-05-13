@@ -163,7 +163,7 @@ Swagger: http://localhost:8080/swagger-ui.html
 
 ## 👨‍💻 Autor
 #### Bruna Prudencio
-📧 Email: prudenciobruh@gmail.com
-💼 LinkedIn: https://linkedin.com/in/bruna-prudencio
-📌 Portfólio: https://bruna.arbru.com.br/
+- 📧 Email: prudenciobruh@gmail.com
+- 💼 LinkedIn: https://linkedin.com/in/bruna-prudencio
+- 📌 Portfólio: https://bruna.arbru.com.br/
 ---
